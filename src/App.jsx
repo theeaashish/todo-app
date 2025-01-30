@@ -4,16 +4,32 @@ import { useState } from "react";
 function App() {
   const [content, setContent] = useState([]);
   const [task, setTask] = useState("");
+  const [editingTask, setEditingTask] = useState(null);
 
-  const addTask = () => {
+  const handleTask = () => {
     if (task === "") return;
-    setContent([...content, task]);
+
+    if (editingTask !== null) {
+      const updatedTask = [...content];
+      updatedTask[editingTask] = task;
+      setContent(updatedTask);
+      setEditingTask(null);
+    } else {
+      setContent([...content, task]);
+    }
+
+    setTask("");
   };
 
   const deleteTask = (index) => {
     const removeTask = content.filter((_, i) => i != index);
     setContent(removeTask);
-  }
+  };
+
+  const editTask = (index) => {
+    setTask(content[index]);
+    setEditingTask(index);
+  };
 
   return (
     <div className="flex min-h-screen justify-center items-center">
@@ -30,23 +46,27 @@ function App() {
               }}
             />
             <button
-              onClick={addTask}
+              onClick={handleTask}
               className="bg-[#8E94F2] hover:bg-[#5E548E] transition-all px-3 h-9 rounded-md cursor-pointer text-sm"
             >
-              Add task
+              {editingTask !== null ? "Update" : "Add"}
             </button>
           </div>
         </div>
 
         <div className="w-full gap-4 flex flex-col">
           {content.map((item, index) => (
-            <div className="flex items-center gap-2 w-full px-5 bg-[#8E94F2] justify-between h-12 rounded-md" key={index}>
+            <div
+              className="flex items-center gap-2 w-full px-5 bg-[#8E94F2] justify-between h-12 rounded-md"
+              key={index}
+            >
               <p>{item}</p>
               <div className="flex gap-2">
                 <img
                   className="w-5 invert cursor-pointer"
                   src="./img/edit.svg"
                   alt="edit"
+                  onClick={() => editTask(index)}
                 />
                 <img
                   className="w-5 invert cursor-pointer"
